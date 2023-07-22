@@ -1,3 +1,8 @@
+/*
+Kod för Klocka SK6812 WWA, SK6812 RGBW, SK6812 Låst
+Hårdvara: Melvin Olsson | Mjukvara: William Andersson
+Senast ändrad: 2023-07-23 00:05
+*/
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
 #include "RTClib.h"   //RTC lib Logic & functions Neiron (Inte Adafruit)
