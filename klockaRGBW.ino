@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 RGBW
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-07-27 20:49
+Senast ändrad: 2023-07-27 20:46
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -12,7 +12,7 @@ Senast ändrad: 2023-07-27 20:49
 //LED inställningar
 #define LED_PIN 2
 #define NUM_LEDS 154 //inklusive minut
-Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_RGBW + NEO_KHZ800);
 
 const int ledColors[5][4] //Färg steg
 {
@@ -122,7 +122,7 @@ void ChangeTime(int _hour, int _minute)
   {
     strip.setPixelColor(led, 0,0,0,0);
   }
-  delay(25);
+  delay(50);
 
   //Ta fram hur många kolumner det är i arrays
   int wordLedsCols = (sizeof(wordLeds[0]) / sizeof(wordLeds[0][0]));
@@ -134,7 +134,7 @@ void ChangeTime(int _hour, int _minute)
   {
     strip.setPixelColor(wordLeds[0][i], ledColors[currentColor][0],ledColors[currentColor][1],ledColors[currentColor][2],strip.gamma8(ledColors[currentColor][3]));
   }
-  delay(25);
+  delay(50);
 
   //Tänd vilken timme det är
 
@@ -165,7 +165,7 @@ void ChangeTime(int _hour, int _minute)
   {
     strip.setPixelColor(hourLeds[_hour][i], ledColors[currentColor][0],ledColors[currentColor][1],ledColors[currentColor][2],strip.gamma8(ledColors[currentColor][3]));
   }
-  delay(25);
+  delay(50);
 
   //Tänd avrundad minut (Fem I, Tio I osv)
   int minuteArrayNR = 0;
@@ -187,7 +187,7 @@ void ChangeTime(int _hour, int _minute)
   {
     strip.setPixelColor(wordLeds[minuteArrayNR][i], ledColors[currentColor][0],ledColors[currentColor][1],ledColors[currentColor][2],strip.gamma8(ledColors[currentColor][3]));
   }
-  delay(25);
+  delay(50);
 
   //Tänd minut prickar
   if(_minute > 0 && _minute < 5)
@@ -217,7 +217,7 @@ void ChangeTime(int _hour, int _minute)
     strip.setPixelColor(152, 0,0,0,0);
     strip.setPixelColor(153, 0,0,0,0);
   }
-  delay(50);
+  delay(100);
 
   //Uppdatera allt
   strip.setBrightness(brightness);
