@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 RGBW
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-07-27 20:46
+Senast ändrad: 2023-07-27 20:49
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -97,8 +97,8 @@ void setup()
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); //Uppdatera tid till tiden då senaste gången koden laddades upp | Ladda först upp med det på för att sätta tiden, sen kommentera bort det och ladda upp igen.
 
   strip.begin();
-  strip.show();
   LedsOFF();
+  strip.show();
   
 
   btn.attachClick(btnClick);
