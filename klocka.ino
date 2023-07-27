@@ -1,7 +1,7 @@
 /*
-Kod för Klocka SK6812 WWA, SK6812 RGBW, SK6812 Låst
+Kod för Klocka SK6812 WWA, SK6812 Låst
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-07-23 00:05
+Senast ändrad: 2023-07-27 20:12
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -12,7 +12,7 @@ Senast ändrad: 2023-07-23 00:05
 //LED inställningar
 #define LED_PIN 2
 #define NUM_LEDS 154 //inklusive minut
-#define LED_MODE 0 // 0 = SK6812 WWA | 1 = SK6812 RGBW | 2 = SK6812 Låst
+#define LED_MODE 2 // 0 = SK6812 WWA | 1 = SK6812 Låst
 CRGB ledColors[8];
 int ledColorsSize = ((sizeof(ledColors) / sizeof(ledColors[0])) - 1);
 int currentColor = constrain(1, 0, ledColorsSize);
@@ -85,7 +85,7 @@ void setup()
   if (!rtc.begin()){} // Om arduino inte kan hitta RTC.
   if (!rtc.isrunning()) {}
 
-  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); //Uppdatera tid till tiden då senaste gången koden laddades upp
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); //Uppdatera tid till tiden då senaste gången koden laddades upp | Ladda först upp med det på för att sätta tiden, sen kommentera bort det och laddaa upp igen.
 
 
   //Led color
@@ -304,4 +304,3 @@ void loop()
     }
   }
 }
-
