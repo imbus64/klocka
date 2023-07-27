@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 RGBW
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-07-27 20:12
+Senast ändrad: 2023-07-27 20:46
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -217,7 +217,7 @@ void ChangeTime(int _hour, int _minute)
     strip.setPixelColor(152, 0,0,0,0);
     strip.setPixelColor(153, 0,0,0,0);
   }
-  delay(25);
+  delay(50);
 
   //Uppdatera allt
   strip.setBrightness(brightness);
