@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 WWA, SK6812 Låst
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-07-27 20:12
+Senast ändrad: 2023-08-15 19:36
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -274,6 +274,15 @@ void btnLongPressStop()
   btnLongPress = false;
 }
 
+bool isSummerTime(DateTime now) {
+    // Den första dagen för sommartid.
+    DateTime startDST(now.year(), 3, 31 - (5 + now.year() * 5 / 4) % 7, 2, 0, 0); // Sista söndagen i mars, 02:00
+    // Den sista dagen för sommartid.
+    DateTime endDST(now.year(), 10, 31 - (2 + now.year() * 5 / 4) % 7, 3, 0, 0);  // Sista söndagen i oktober, 03:00
+
+    return (now >= startDST && now < endDST);
+}
+
 void loop()
 {
   delay(50); // Hur snabbt loopen ska ticka.
@@ -285,7 +294,14 @@ void loop()
   if(pastTime.minute() != rtcTime.minute())
   {
     pastTime = rtcTime;
-    ChangeTime(rtcTime.hour(), rtcTime.minute());
+    if(isSummerTime(rtc.now()))
+    {
+      ChangeTime(rtcTime.hour(), rtcTime.minute());
+    }
+    else
+    {
+      ChangeTime((rtcTime.hour() - 1), rtcTime.minute());
+    }
   }
 
   if(btnLongPress)
