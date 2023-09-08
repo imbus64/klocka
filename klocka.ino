@@ -12,7 +12,7 @@ Senast ändrad: 2023-08-15 19:36
 //LED inställningar
 #define LED_PIN 2
 #define NUM_LEDS 154 //inklusive minut
-#define LED_MODE 2 // 0 = SK6812 WWA | 1 = SK6812 Låst
+#define LED_MODE 0 // 0 = SK6812 WWA | 1 = SK6812 Låst
 CRGB ledColors[8];
 int ledColorsSize = ((sizeof(ledColors) / sizeof(ledColors[0])) - 1);
 int currentColor = constrain(1, 0, ledColorsSize);
