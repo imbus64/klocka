@@ -1,7 +1,7 @@
 /*
 Kod för Klocka NY MATRIS
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-09-07 21:45
+Senast ändrad: 2023-09-07 22:10
 */
 #include <Arduino.h>
 #include <Wire.h>     // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -12,7 +12,6 @@ Senast ändrad: 2023-09-07 21:45
 //LED inställningar
 #define LED_PIN 2
 #define NUM_LEDS 152 //inklusive minut
-#define LED_MODE 2 // 0 = SK6812 WWA | 1 = SK6812 Låst
 CRGB ledColors[8];
 int ledColorsSize = ((sizeof(ledColors) / sizeof(ledColors[0])) - 1);
 int currentColor = constrain(1, 0, ledColorsSize);
@@ -92,31 +91,20 @@ void setup()
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); //Uppdatera tid till tiden då senaste gången koden laddades upp | Ladda först upp med det på för att sätta tiden, sen kommentera bort det och laddaa upp igen.
 
-
-  //Led color
-
-  if(LED_MODE == 0)
+  CRGB colors[] = {
+    //Amber | Kall vit | Varm vit
+    CRGB(0,255,0),
+    CRGB(0,255,50),
+    CRGB(0,200,100),
+    CRGB(0,150,150),
+    CRGB(0,100,200),
+    CRGB(0,50,255),
+    CRGB(0,0,255),
+    CRGB(255,0,255),
+  };
+  for (int i = 0; i < (ledColorsSize + 1); i++)
   {
-    CRGB colors[] = {
-      //Amber | Kall vit | Varm vit
-      CRGB(0,255,0),
-      CRGB(0,255,50),
-      CRGB(0,200,100),
-      CRGB(0,150,150),
-      CRGB(0,100,200),
-      CRGB(0,50,255),
-      CRGB(0,0,255),
-      CRGB(255,0,255),
-    };
-    for (int i = 0; i < (ledColorsSize + 1); i++)
-    {
-      ledColors[i] = colors[i];
-    }
-  }
-  else if(LED_MODE != 0)
-  {
-    currentColor = 1;
-    ledColors[currentColor] = CRGB(255,255,255);
+    ledColors[i] = colors[i];
   }
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
@@ -249,19 +237,16 @@ void ChangeTime(int _hour, int _minute)
 
 void btnClick()
 {
-  if(LED_MODE == 0) //SK6812 WWA
+  DateTime rtcTime = rtc.now();
+  if(currentColor == ledColorsSize)
   {
-    DateTime rtcTime = rtc.now();
-    if(currentColor == ledColorsSize)
-    {
-      currentColor = 0;
-      ChangeTime(rtcTime.hour(), rtcTime.minute());
-    }
-    else
-    {
-      currentColor = constrain((currentColor + 1), 0, ledColorsSize);
-      ChangeTime(rtcTime.hour(), rtcTime.minute());
-    }
+    currentColor = 0;
+    ChangeTime(rtcTime.hour(), rtcTime.minute());
+  }
+  else
+  {
+    currentColor = constrain((currentColor + 1), 0, ledColorsSize);
+    ChangeTime(rtcTime.hour(), rtcTime.minute());
   }
 }
 
