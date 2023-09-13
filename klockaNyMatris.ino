@@ -1,7 +1,7 @@
 /*
 !!! Endast kod för klocka med SK6812WWA leds och med nya matrisen !!!
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Version: 1
+Version: 1.1
 */
 //Libraries
 #include <Arduino.h>
@@ -32,7 +32,7 @@ const CRGB colors[] = {
   CRGB(0,0,255),
   CRGB(255,0,255),
 };
-int colorsSize = ((sizeof(colors) / sizeof(colors[0])) - 1);
+const int colorsSize = ((sizeof(colors) / sizeof(colors[0])) - 1);
 int currentColor = constrain(1, 0, colorsSize);
 int brightness = constrain(50, 5, 255); // 180
 
@@ -125,6 +125,8 @@ void setup()
   btn.attachClick(btnClick);
   btn.attachLongPressStart(btnLongPressStart);
   btn.attachLongPressStop(btnLongPressStop);
+  delay(25);
+  pastTime = DateTime(0,0,0,0,0,0);
   delay(25);
 }
 
@@ -344,5 +346,3 @@ void loop()
     }
   }
 }
-
-
