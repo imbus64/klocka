@@ -1,7 +1,7 @@
 /*
 !!! Endast kod för klocka med SK6812WWA leds och med nya matrisen !!!
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Version: 1.1
+Version: 1.2
 */
 //Libraries
 #include <Arduino.h>
