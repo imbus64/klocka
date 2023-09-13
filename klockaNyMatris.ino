@@ -34,7 +34,7 @@ const CRGB colors[] = {
 };
 const int colorsSize = ((sizeof(colors) / sizeof(colors[0])) - 1);
 int currentColor = constrain(1, 0, colorsSize);
-int brightness = constrain(50, 5, 255); // 180
+int brightness = constrain(180, 5, 255); // 180
 
 //Inställningar för knappen
 const int BUTTON_PIN = 5; //Pin på arduino
