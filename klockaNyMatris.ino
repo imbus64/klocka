@@ -1,7 +1,13 @@
 /*
 !!! Endast kod för klocka med SK6812WWA leds och med nya matrisen !!!
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Version: 1.2
+Version: 1.3
+*/
+/*
+!!!KNAPP INSTRUKTIONER!!!
+Vanligt klick = Växla färg
+Dubbel Klick = Växla mellan sommartid och vintertid
+Hålla inne = Ljusstyrka
 */
 //Libraries
 #include <Arduino.h>
@@ -68,7 +74,7 @@ const int hourLeds[12][8] //ETT till TOLV
   /*8 NIO  */ {18,19,20,21,58,59, X,X},
   /*9 TIO  */ {118,119,124,125,144,145, X,X},
   /*10 ELVA*/ {60,61,80,81,82,83,88,89},
-  /*11 TOLV*/ {90,91,120,121,122,213,146,147},
+  /*11 TOLV*/ {90,91,120,121,122,123,146,147},
 };
 
 const int wordLeds[12][22] //ÖVER, HALV, osv..
@@ -95,6 +101,9 @@ const int minuteLeds[4][4] //Små lamporna som visar minut
   /*Minut 4*/ {minutLedNr1,minutLedNr2,minutLedNr3,minutLedNr4},
 };
 
+//Sommar eller vintertid
+bool isSummerTime = true; //Om det är sommartid när du laddar upp koden så ska det vara true, annars false!
+const bool uploadInSummerTime = true ; //Om det är sommartid när du laddar upp koden så ska det vara true, annars false!
 
 //ARDUINO FUNKTIONER
 void setup()
@@ -110,22 +119,25 @@ void setup()
     delay(100);
   }
   delay(25);
+  btn.attachClick(btnClick);
+  btn.attachLongPressStart(btnLongPressStart);
+  btn.attachLongPressStop(btnLongPressStop);
+  btn.attachDoubleClick(btnMultiClick);
+  delay(25);
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(brightness); // Set initial brightness
+  delay(25);
   //Allt nödvändigt är igång
 
   //Uppdatera tid till tiden då senaste gången koden laddades upp.
   //Ladda först upp med det på för att sätta tiden, sen kommentera bort det och ladda upp igen.
+
+  //!!OBS! Om du laddar upp när det är vintertid måste "uploadInSummerTime" och "isSummerTime" som du kan hitta högre upp ändras till false!!
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
-  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(brightness); // Set initial brightness
-  delay(25);
-
+  //Starta klockan
   ClockStart();
   delay(50);
-  btn.attachClick(btnClick);
-  btn.attachLongPressStart(btnLongPressStart);
-  btn.attachLongPressStop(btnLongPressStop);
-  delay(25);
   pastTime = DateTime(0,0,0,0,0,0);
   delay(25);
 }
@@ -272,13 +284,17 @@ void ChangeTime(int _hour, int _minute)
   FastLED.show();
 }
 
-bool isSummerTime(DateTime now) {
-  // Den första dagen för sommartid.
-  DateTime startDST(now.year(), 3, 31 - (5 + now.year() * 5 / 4) % 7, 2, 0, 0); // Sista söndagen i mars, 02:00
-  // Den sista dagen för sommartid.
-  DateTime endDST(now.year(), 10, 31 - (2 + now.year() * 5 / 4) % 7, 3, 0, 0);  // Sista söndagen i oktober, 03:00
-
-  return (now >= startDST && now < endDST);
+void TriggerUpdate()
+{
+  delay(10);
+  if (pastTime.minute() > 0)
+  {
+    pastTime = DateTime(pastTime.year(), pastTime.month(), pastTime.day(), pastTime.hour(), pastTime.minute() - 1, pastTime.second());
+  }
+  else
+  {
+    pastTime = DateTime(pastTime.year(), pastTime.month(), pastTime.day(), pastTime.hour(), pastTime.minute() + 1, pastTime.second());
+  }
 }
 
 void btnClick()
@@ -287,12 +303,12 @@ void btnClick()
   if(currentColor == colorsSize)
   {
     currentColor = 0;
-    ChangeTime(rtcTime.hour(), rtcTime.minute());
+    TriggerUpdate();
   }
   else
   {
     currentColor = constrain((currentColor + 1), 0, colorsSize);
-    ChangeTime(rtcTime.hour(), rtcTime.minute());
+    TriggerUpdate();
   }
 }
 
@@ -309,9 +325,16 @@ void btnLongPressStop()
   btnLongPress = false;
 }
 
+void btnMultiClick()
+{
+  if(isSummerTime == true) {  isSummerTime = false;  }
+  else if(isSummerTime == false) {  isSummerTime = true;  }
+  TriggerUpdate(); 
+}
+
 void loop()
 {
-  delay(50); // Hur snabbt loopen ska ticka.
+  delay(10); // Hur snabbt loopen ska ticka.
   btn.tick();
 
   DateTime rtcTime = rtc.now(); // Plockar nuvarande tid.
@@ -320,13 +343,33 @@ void loop()
   if(pastTime.minute() != rtcTime.minute())
   {
     pastTime = rtcTime;
-    if(isSummerTime(rtc.now()))
+    if(isSummerTime == true)
     {
-      ChangeTime(rtcTime.hour(), rtcTime.minute());
+      //Sommartid
+      if(uploadInSummerTime == true)
+      {
+        //Serial.println("1");
+        ChangeTime(rtcTime.hour(), rtcTime.minute());
+      }
+      else
+      {
+        //Serial.println("2");
+        ChangeTime((rtcTime.hour() + 1), rtcTime.minute());
+      }
     }
-    else
+    else if(isSummerTime == false)
     {
-      ChangeTime((rtcTime.hour() - 1), rtcTime.minute());
+      //Vintertid
+      if(uploadInSummerTime == true)
+      {
+        //Serial.println("3");
+        ChangeTime((rtcTime.hour() - 1), rtcTime.minute());
+      }
+      else
+      {
+        //Serial.println("4");
+        ChangeTime(rtcTime.hour(), rtcTime.minute());
+      }
     }
   }
 
