@@ -317,7 +317,6 @@ void btnClick()
 {
   if(LED_MODE == 0) //SK6812 WWA
   {
-    DateTime rtcTime = rtc.now();
     if(currentColor == ledColorsSize)
     {
       currentColor = 0;
