@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 WWA, SK6812 Låst
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-11-3 22:37
+Senast ändrad: 2023-11-3 23:05
 */
 /*
 !!!KNAPP INSTRUKTIONER!!!
@@ -383,7 +383,7 @@ void loop()
         //Serial.println("3");
         if(rtcTime.hour() == 0)
         {
-          ChangeTime(23), rtcTime.minute());
+          ChangeTime(23, rtcTime.minute());
         }
         else
         {
