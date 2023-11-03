@@ -1,7 +1,7 @@
 /*
 !!! Endast kod för klocka med SK6812WWA leds och med nya matrisen !!!
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Version: 1.4
+Version: 1.4 Senast ändrad: 2023-11-3 22:39
 */
 /*
 !!!KNAPP INSTRUKTIONER!!!
