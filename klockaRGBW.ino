@@ -1,7 +1,7 @@
 /*
 Kod för Klocka SK6812 RGBW
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Senast ändrad: 2023-10-1 16:15
+Senast ändrad: 2023-11-3 22:38
 */
 /*
 !!!KNAPP INSTRUKTIONER!!!
@@ -370,7 +370,14 @@ void loop()
       if(uploadInSummerTime == true)
       {
         //Serial.println("3");
-        ChangeTime((rtcTime.hour() - 1), rtcTime.minute());
+        if(rtcTime.hour() == 0)
+        {
+          ChangeTime(23), rtcTime.minute());
+        }
+        else
+        {
+          ChangeTime((rtcTime.hour() - 1), rtcTime.minute());
+        }        
       }
       else
       {
