@@ -1,7 +1,7 @@
 /*
 !!! Endast kod för klocka med SK6812WWA leds och med nya matrisen !!!
 Hårdvara: Melvin Olsson | Mjukvara: William Andersson
-Version: 1.4 Senast ändrad: 2023-11-3 22:39
+Version: 1.5 Senast ändrad: 2023-11-3 23:04
 */
 /*
 !!!KNAPP INSTRUKTIONER!!!
@@ -365,7 +365,7 @@ void loop()
         //Serial.println("3");
         if(rtcTime.hour() == 0)
         {
-          ChangeTime(23), rtcTime.minute());
+          ChangeTime(23, rtcTime.minute());
         }
         else
         {
