@@ -230,7 +230,7 @@ def adjust_brightness():
 
     if increasing:
         increasing = False
-    else if not increasing:
+    elif not increasing:
         increasing = True
     
     while button.is_pressed:
