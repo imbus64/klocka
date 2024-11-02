@@ -6,7 +6,7 @@
 #         HW: Melvin Olsson            #
 #        SW: William Andersson         #
 #                                      #
-#           Version: 2.0               #
+#           Version: 2.1               #
 #            2024-11-02                #
 ########################################
 
