@@ -6,7 +6,7 @@
 #         HW: Melvin Olsson            #
 #        SW: William Andersson         #
 #                                      #
-#           Version: 2.1               #
+#           Version: 2.2               #
 #            2024-11-02                #
 ########################################
 
@@ -120,6 +120,7 @@ strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT,
 clockStarted = False
 currentTime = datetime.datetime.now()
 press_time = 0  # Variabel för att lagra tidpunkten när knappen trycks ned
+brightnessIncreasing = True # Startar med att öka ljusstyrkan när knappen hålls inne
 
 ######## FUNKTIONER ########
 
@@ -226,15 +227,11 @@ def UpdateTime(fStrip, fTime, fColor, fBrightness):
 button = Button(BUTTON_PIN, pull_up=True, hold_time=BUTTON_HOLD_TIME, bounce_time=BOUNCE_TIME)
 
 def adjust_brightness():
-    global currentBrightness
-
-    if increasing:
-        increasing = False
-    elif not increasing:
-        increasing = True
+    global currentBrightness, brightnessIncreasing
+    brightnessIncreasing = not brightnessIncreasing
     
     while button.is_pressed:
-        if increasing:
+        if brightnessIncreasing:
             currentBrightness += BRIGHTNESS_STEP
             if currentBrightness >= MAX_BRIGHTNESS:
                 currentBrightness = MAX_BRIGHTNESS
