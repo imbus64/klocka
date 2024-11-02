@@ -6,7 +6,7 @@
 #         HW: Melvin Olsson            #
 #        SW: William Andersson         #
 #                                      #
-#           Version: 1.9               #
+#           Version: 2.0               #
 #            2024-11-02                #
 ########################################
 
@@ -101,10 +101,10 @@ word_leds = [
 ]
 
 # Små lampor som visar minut
-minut_led_nr1 = 148
-minut_led_nr2 = 149
-minut_led_nr3 = 150
-minut_led_nr4 = 151
+minut_led_nr1 = 151
+minut_led_nr2 = 150
+minut_led_nr3 = 149
+minut_led_nr4 = 148
 
 minute_leds = [
     [minut_led_nr1],  # Minut 1
