@@ -59,7 +59,6 @@ BUTTON_HOLD_TIME = 1       # Tid i sekunder för att registrera ett knapphåll
 BRIGHTNESS_STEP = 5        # Stegstorlek för ljusstyrkejustering
 MIN_BRIGHTNESS = 10        # Minimal ljusstyrka
 MAX_BRIGHTNESS = 255       # Maximal ljusstyrka
-WAIT_TIME_AT_BRIGHTNESS = 2  # Väntetid vid maximal/minimal ljusstyrka i sekunder
 BOUNCE_TIME = 0.1         # Debounce-tid för knappen i sekunder
 
 ######## LED-MATRIS PINOUT ########
@@ -229,20 +228,20 @@ button = Button(BUTTON_PIN, pull_up=True, hold_time=BUTTON_HOLD_TIME, bounce_tim
 def adjust_brightness():
     global currentBrightness
 
-    increasing = True
+    if increasing:
+        increasing = False
+    else if not increasing:
+        increasing = True
+    
     while button.is_pressed:
         if increasing:
             currentBrightness += BRIGHTNESS_STEP
             if currentBrightness >= MAX_BRIGHTNESS:
                 currentBrightness = MAX_BRIGHTNESS
-                time.sleep(WAIT_TIME_AT_BRIGHTNESS)  # Vänta vid maximal ljusstyrka
-                increasing = False
         else:
             currentBrightness -= BRIGHTNESS_STEP
             if currentBrightness <= MIN_BRIGHTNESS:
                 currentBrightness = MIN_BRIGHTNESS
-                time.sleep(WAIT_TIME_AT_BRIGHTNESS)  # Vänta vid minimal ljusstyrka
-                increasing = True
 
         # Uppdatera ljusstyrkan på strippen
         strip.setBrightness(currentBrightness)
