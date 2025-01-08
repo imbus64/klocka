@@ -20,6 +20,8 @@ import datetime
 import threading
 import sys
 import traceback
+from enum import Enum
+import itertools
 
 ######## VARIABLER ########
 
@@ -36,21 +38,26 @@ LED_STRIP = ws.SK6812_STRIP  # Typ av LED-strip, anpassad för WWA.
 # Platshållare för ingen LED
 X = 199
 
-# LED-FÄRGER (Amber, Kallvit, Varmvit)
-color_options = [
-    Color(128, 255, 0),    # Standard
-    Color(0, 255, 0),      # Mycket kallvit
-    Color(0, 255, 64),     # Kallvit
-    Color(0, 255, 128),    # Neutralvit
-    Color(0, 192, 192),    # Mjukvit
-    Color(0, 128, 255),    # Varmvit
-    Color(0, 64, 255),     # Varm glödlampa
-    Color(0, 0, 255),      # Mycket varm (stearinljus)
-]
+
+class LedColor(Enum):
+    RED = Color(128, 255, 0)
+    ICE_COLD_WHITE = (Color(0, 255, 0),)  # Mycket kallvit
+    COLD_WHITE = (Color(0, 255, 64),)  # Kallvit
+    NEUTRAL_WHITE = (Color(0, 255, 128),)  # Neutralvit
+    SOFT_WHITE = (Color(0, 192, 192),)  # Mjukvit
+    WARM_WHITE = (Color(0, 128, 255),)  # Varmvit
+    WARMER_WHITE = (Color(0, 64, 255),)  # Varm glödlampa
+    WARMEST_WHITE = (Color(0, 0, 255),)  # Mycket varm (stearinljus)
+
+
+# Cyclic iterable over LedColor, yielding a new color every iteration.
+# This iterator wraps. Use as:
+#   c = next(color_cycle) #-> c = RED
+#   c = next(color_cycle) #-> c = WHATEVER
+color_cycle = itertools.cycle(LedColor)
 
 # Initiala inställningar
-currentColorIndex = 0
-currentColor = color_options[currentColorIndex]
+currentColor = LedColor.RED
 currentBrightness = 200  # Standardljusstyrka (0-255)
 
 # Knappinställningar
@@ -229,16 +236,14 @@ button = Button(BUTTON_PIN, pull_up=True, hold_time=BUTTON_HOLD_TIME, bounce_tim
 def adjust_brightness():
     global currentBrightness, brightnessIncreasing
     brightnessIncreasing = not brightnessIncreasing
-    
+
+    # NOTE: Get brightness from strip object instead of global?
+
+    step = BRIGHTNESS_STEP if brightnessIncreasing else -BRIGHTNESS_STEP
+
     while button.is_pressed:
-        if brightnessIncreasing:
-            currentBrightness += BRIGHTNESS_STEP
-            if currentBrightness >= MAX_BRIGHTNESS:
-                currentBrightness = MAX_BRIGHTNESS
-        else:
-            currentBrightness -= BRIGHTNESS_STEP
-            if currentBrightness <= MIN_BRIGHTNESS:
-                currentBrightness = MIN_BRIGHTNESS
+        # Update brightness with boundary checks
+        currentBrightness = max(min(currentBrightness + step, MAX_BRIGHTNESS), MIN_BRIGHTNESS)
 
         # Uppdatera ljusstyrkan på strippen
         strip.setBrightness(currentBrightness)
@@ -262,12 +267,12 @@ def on_button_released():
     print("Knapp släppt vid {:.2f}, hålltid: {:.2f} sekunder".format(release_time, hold_duration))
     if hold_duration < BUTTON_HOLD_TIME:
         # Knappen klickades, ändra färg
-        currentColorIndex = (currentColorIndex + 1) % len(color_options)
-        currentColor = color_options[currentColorIndex]
+        # currentColorIndex = (currentColorIndex + 1) % len(color_options)
+        currentColor = next(color_cycle)
         # Uppdatera displayen med den nya färgen
         currentTime = datetime.datetime.now()
         UpdateTime(strip, currentTime, currentColor, currentBrightness)
-        print("Färg ändrad till alternativ {}".format(currentColorIndex + 1))
+        print("Färg ändrad till alternativ {}".format(currentColor.name))
     else:
         # Knappen hölls ned längre än hold_time
         print("Knappen hölls ned längre än hold_time")
@@ -276,9 +281,12 @@ def on_button_held():
     print("Knappen hålls ned, startar ljusstyrkejustering")
     threading.Thread(target=adjust_brightness).start()
 
+# Callbacks for button
 button.when_pressed = on_button_pressed
 button.when_released = on_button_released
 button.when_held = on_button_held
+
+# NOTE: Asyncio?
 
 ######## HUVUDLOOP ########
 while True:  # Yttre loop för att hantera omstarter och fel
