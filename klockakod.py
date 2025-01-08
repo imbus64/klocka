@@ -116,6 +116,7 @@ minute_leds = [
     [minut_led_nr1, minut_led_nr2],  # Minut 2
     [minut_led_nr1, minut_led_nr2, minut_led_nr3],  # Minut 3
     [minut_led_nr1, minut_led_nr2, minut_led_nr3, minut_led_nr4]  # Minut 4
+]
 
 # Define the time intervals and their corresponding words
 time_intervals = [
