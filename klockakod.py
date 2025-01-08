@@ -69,41 +69,41 @@ BOUNCE_TIME = 0.1         # Debounce-tid för knappen i sekunder
 
 ######## LED-MATRIS PINOUT ########
 
-# LED-MATRISER (ingen ändring har gjorts här)
-hour_leds = [
-    [10, 11, 28, 29, 50, 51],          # ETT
-    [12, 13, 26, 27, 52, 53],          # TVÅ
-    [14, 15, 24, 25, 54, 55],          # TRE
-    [92, 93, 114, 115, 128, 129, 140, 141],  # FYRA
-    [112, 113, 130, 131, 138, 139],    # FEM
-    [16, 17, 22, 23, 56, 57],          # SEX
-    [116, 117, 126, 127, 142, 143],    # SJU
-    [62, 63, 78, 79, 84, 85, 86, 87],  # ÅTTA
-    [18, 19, 20, 21, 58, 59],          # NIO
-    [118, 119, 124, 125, 144, 145],    # TIO
-    [60, 61, 80, 81, 82, 83, 88, 89],  # ELVA
-    [90, 91, 120, 121, 122, 123, 146, 147]   # TOLV
-]
 
-word_leds = [
-    [0, 1, 38, 39, 40, 41, 70, 71, 72, 73, 96, 97, 98, 99, 104,
-     105, 134, 135],  # KLOCKAN ÄR
-    [2, 3, 36, 37, 42, 43, 108, 109],  # FEM I
-    [100, 101, 102, 103, 106, 107, 108, 109],  # TIO I
-    [4, 5, 34, 35, 44, 45, 68, 69, 74, 75, 108, 109],  # KVART I
-    [6, 7, 32, 33, 46, 47, 66, 67, 76, 77, 108, 109],  # TJUGO I
-    [2, 3, 36, 37, 42, 43, 108, 109, 94, 95, 110, 111,
-     132, 133, 136, 137],  # FEM I HALV
-    [94, 95, 110, 111, 132, 133, 136, 137],  # HALV
-    [2, 3, 36, 37, 42, 43, 8, 9, 30, 31, 48, 49, 64, 65,
-     94, 95, 110, 111, 132, 133, 136, 137],  # FEM ÖVER HALV
-    [2, 3, 36, 37, 42, 43, 8, 9, 30, 31, 48, 49, 64, 65],  # FEM ÖVER
-    [100, 101, 102, 103, 106, 107, 8, 9, 30, 31, 48, 49, 64, 65],  # TIO ÖVER
-    [4, 5, 34, 35, 44, 45, 68, 69, 74, 75, 8, 9, 30, 31,
-     48, 49, 64, 65],  # KVART ÖVER
-    [6, 7, 32, 33, 46, 47, 66, 67, 76, 77, 8, 9, 30, 31,
-     48, 49, 64, 65]  # TJUGO ÖVER
-]
+class LedHours(Enum):
+    ETT = ([10, 11, 28, 29, 50, 51],)  # ETT
+    TVA = ([12, 13, 26, 27, 52, 53],)  # TVÅ
+    TRE = ([14, 15, 24, 25, 54, 55],)  # TRE
+    FYRA = ([92, 93, 114, 115, 128, 129, 140, 141],)  # FYRA
+    FEM = ([112, 113, 130, 131, 138, 139],)  # FEM
+    SEX = ([16, 17, 22, 23, 56, 57],)  # SEX
+    SJU = ([116, 117, 126, 127, 142, 143],)  # SJU
+    ATTA = ([62, 63, 78, 79, 84, 85, 86, 87],)  # ÅTTA
+    NIO = ([18, 19, 20, 21, 58, 59],)  # NIO
+    TIO = ([118, 119, 124, 125, 144, 145],)  # TIO
+    ELVA = ([60, 61, 80, 81, 82, 83, 88, 89],)  # ELVA
+    TOLV = ([90, 91, 120, 121, 122, 123, 146, 147],)  # TOLV
+
+    @classmethod
+    def get_nth_hour(cls, n: int):
+        """Returns the Nth hour (N is a 0-based index)."""
+        return list(cls)[n % len(cls)].value[0]
+
+
+class LedWords(Enum):
+    KLOCKAN_AR = ([0, 1, 38, 39, 40, 41, 70, 71, 72, 73, 96, 97, 98, 99, 104, 105, 134, 135],)  # KLOCKAN ÄR
+    FEM_I = ([2, 3, 36, 37, 42, 43, 108, 109],)  # FEM I
+    TIO_I = ([100, 101, 102, 103, 106, 107, 108, 109],)  # TIO I
+    KVART_I = ([4, 5, 34, 35, 44, 45, 68, 69, 74, 75, 108, 109],)  # KVART I
+    TJUGO_I = ([6, 7, 32, 33, 46, 47, 66, 67, 76, 77, 108, 109],)  # TJUGO I
+    FEMI_I_HALV = ([2, 3, 36, 37, 42, 43, 108, 109, 94, 95, 110, 111, 132, 133, 136, 137],)  # FEM I HALV
+    HALV = ([94, 95, 110, 111, 132, 133, 136, 137],)  # HALV
+    FEM_OVER_HALV = ([2, 3, 36, 37, 42, 43, 8, 9, 30, 31, 48, 49, 64, 65, 94, 95, 110, 111, 132, 133, 136, 137],)
+    FEM_OVER = ([2, 3, 36, 37, 42, 43, 8, 9, 30, 31, 48, 49, 64, 65],)  # FEM ÖVER
+    TIO_OVER = ([100, 101, 102, 103, 106, 107, 8, 9, 30, 31, 48, 49, 64, 65],)  # TIO ÖVER
+    KVART_OVER = ([4, 5, 34, 35, 44, 45, 68, 69, 74, 75, 8, 9, 30, 31, 48, 49, 64, 65],)  # KVART ÖVER
+    TJUGO_OVER = ([6, 7, 32, 33, 46, 47, 66, 67, 76, 77, 8, 9, 30, 31, 48, 49, 64, 65],)  # TJUGO ÖVER
+
 
 # Små lampor som visar minut
 minut_led_nr1 = 151
@@ -120,17 +120,17 @@ minute_leds = [
 # Define the time intervals and their corresponding words
 time_intervals = [
     (range(0, 5), []),  # "KLOCKAN ÄR" + timme
-    (range(5, 10), word_leds[8]),  # "Fem Över" + timme
-    (range(10, 15), word_leds[9]),  # "Tio Över" + timme
-    (range(15, 20), word_leds[10]),  # "Kvart Över" + timme
-    (range(20, 25), word_leds[11]),  # "Tjugo Över" + timme
-    (range(25, 30), word_leds[5]),  # "Fem I Halv" + nästa timme
-    (range(30, 35), word_leds[6]),  # "Halv" + nästa timme
-    (range(35, 40), word_leds[7]),  # "Fem Över Halv" + nästa timme
-    (range(40, 45), word_leds[4]),  # "Tjugo I" + nästa timme
-    (range(45, 50), word_leds[3]),  # "Kvart I" + nästa timme
-    (range(50, 55), word_leds[2]),  # "Tio I" + nästa timme
-    (range(55, 60), word_leds[1]),  # "Fem I" + nästa timme
+    (range(5, 10), LedWords.FEM_OVER),  # "Fem Över" + timme
+    (range(10, 15), LedWords.TIO_OVER),  # "Tio Över" + timme
+    (range(15, 20), LedWords.KVART_OVER),  # "Kvart Över" + timme
+    (range(20, 25), LedWords.TJUGO_OVER),  # "Tjugo Över" + timme
+    (range(25, 30), LedWords.FEMI_I_HALV),  # "Fem I Halv" + nästa timme
+    (range(30, 35), LedWords.HALV),  # "Halv" + nästa timme
+    (range(35, 40), LedWords.FEM_OVER_HALV),  # "Fem Över Halv" + nästa timme
+    (range(40, 45), LedWords.TJUGO_I),  # "Tjugo I" + nästa timme
+    (range(45, 50), LedWords.KVART_I),  # "Kvart I" + nästa timme
+    (range(50, 55), LedWords.TIO_I),  # "Tio I" + nästa timme
+    (range(55, 60), LedWords.FEM_I),  # "Fem I" + nästa timme
 ]
 
 ######## INITIALISERING ########
@@ -163,7 +163,7 @@ def UpdateTime(fStrip: PixelStrip, fTime: datetime, fColor: LedColor, fBrightnes
     fStrip.setBrightness(fBrightness)  # Ställ in önskad ljusstyrka
 
     # Tänd "KLOCKAN ÄR"
-    for iLed in word_leds[0]:
+    for iLed in LedWords.KLOCKAN_AR.value:
         if iLed != X:
             fStrip.setPixelColor(iLed, fColor)
 
@@ -197,7 +197,7 @@ def UpdateTime(fStrip: PixelStrip, fTime: datetime, fColor: LedColor, fBrightnes
             fStrip.setPixelColor(iLed, fColor)
 
     # Tänd timmen
-    for iLed in hour_leds[hour_index % 12]:
+    for iLed in LedHours.get_nth_hour(hour_index):
         if iLed != X:
             fStrip.setPixelColor(iLed, fColor)
 
