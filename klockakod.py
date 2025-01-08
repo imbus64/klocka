@@ -20,7 +20,13 @@ from datetime import datetime
 import threading
 import traceback
 from enum import Enum
+import logging
 import itertools
+
+
+# Simple logging setup
+logging.basicConfig(level=logging.DEBUG)  # , format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 ######## VARIABLER ########
 
@@ -242,26 +248,26 @@ def adjust_brightness():
 def on_button_pressed():
     global press_time
     press_time = time.time()
-    print("Knapp nedtryckt vid {:.2f}".format(press_time))
+    logger.info("Knapp nedtryckt vid {:.2f}".format(press_time))
 
 def on_button_released():
     global currentColorIndex, currentColor
     release_time = time.time()
     hold_duration = release_time - press_time
-    print("Knapp släppt vid {:.2f}, hålltid: {:.2f} sekunder".format(release_time, hold_duration))
+    logger.info("Knapp släppt vid {:.2f}, hålltid: {:.2f} sekunder".format(release_time, hold_duration))
     if hold_duration < BUTTON_HOLD_TIME:
         # Knappen klickades, ändra färg
         currentColor = next(color_cycle)
         # Uppdatera displayen med den nya färgen
         currentTime = datetime.now()
         UpdateTime(strip, currentTime, currentColor, currentBrightness)
-        print("Färg ändrad till alternativ {}".format(currentColor.name))
+        logger.info("Färg ändrad till alternativ {}".format(currentColor.name))
     else:
         # Knappen hölls ned längre än hold_time
-        print("Knappen hölls ned längre än hold_time")
+        logger.info("Knappen hölls ned längre än hold_time")
 
 def on_button_held():
-    print("Knappen hålls ned, startar ljusstyrkejustering")
+    logger.info("Knappen hålls ned, startar ljusstyrkejustering")
     threading.Thread(target=adjust_brightness).start()
 
 # Callbacks for button
@@ -289,7 +295,7 @@ while True:  # Yttre loop för att hantera omstarter och fel
             old_minute = currentTime.minute
 
             clockStarted = True
-            print("Klockan är igång")
+            logger.info("Klockan är igång")
 
         while clockStarted:  # Klockans loop
             # Hämta aktuell tid
@@ -298,16 +304,15 @@ while True:  # Yttre loop för att hantera omstarter och fel
             # Om en ny minut har passerat, uppdatera klockan
             if currentTime.minute != old_minute:
                 UpdateTime(strip, currentTime, currentColor, currentBrightness)
-                print("Uppdaterad tid: {}:{}:{}".format(
-                    currentTime.hour, currentTime.minute, currentTime.second))
+                logger.info("Uppdaterad tid: {}:{}:{}".format(currentTime.hour, currentTime.minute, currentTime.second))
                 old_minute = currentTime.minute
 
             time.sleep(1)  # Vänta en sekund innan nästa kontroll
 
     except Exception as e:
-        print("Ett fel inträffade: ", e)
-        traceback.print_exc()  # Skriv ut detaljerad felinformation
-        print("Startar om loopen...")
+        logger.error("Ett fel inträffade: ", e)
+        logger.error(traceback.format_exc()) # Skriv ut detaljerad felinformation
+        logger.info("Startar om loopen...")
         clockStarted = False
         time.sleep(2)  # Vänta lite innan omstart
 
