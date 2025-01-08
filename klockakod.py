@@ -16,7 +16,7 @@ from gpiozero import Button
 import rpi_ws281x  # Installera med: pip3 install rpi_ws281x --break-system-packages
 from rpi_ws281x import Color, PixelStrip, ws
 import time
-import datetime
+from datetime import datetime
 import threading
 import sys
 import traceback
@@ -117,6 +117,21 @@ minute_leds = [
     [minut_led_nr1, minut_led_nr2],  # Minut 2
     [minut_led_nr1, minut_led_nr2, minut_led_nr3],  # Minut 3
     [minut_led_nr1, minut_led_nr2, minut_led_nr3, minut_led_nr4]  # Minut 4
+
+# Define the time intervals and their corresponding words
+time_intervals = [
+    (range(0, 5), []),  # "KLOCKAN ÄR" + timme
+    (range(5, 10), word_leds[8]),  # "Fem Över" + timme
+    (range(10, 15), word_leds[9]),  # "Tio Över" + timme
+    (range(15, 20), word_leds[10]),  # "Kvart Över" + timme
+    (range(20, 25), word_leds[11]),  # "Tjugo Över" + timme
+    (range(25, 30), word_leds[5]),  # "Fem I Halv" + nästa timme
+    (range(30, 35), word_leds[6]),  # "Halv" + nästa timme
+    (range(35, 40), word_leds[7]),  # "Fem Över Halv" + nästa timme
+    (range(40, 45), word_leds[4]),  # "Tjugo I" + nästa timme
+    (range(45, 50), word_leds[3]),  # "Kvart I" + nästa timme
+    (range(50, 55), word_leds[2]),  # "Tio I" + nästa timme
+    (range(55, 60), word_leds[1]),  # "Fem I" + nästa timme
 ]
 
 ######## INITIALISERING ########
@@ -125,14 +140,14 @@ strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT,
                    LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
 
 clockStarted = False
-currentTime = datetime.datetime.now()
+currentTime = datetime.now()
 press_time = 0  # Variabel för att lagra tidpunkten när knappen trycks ned
 brightnessIncreasing = True # Startar med att öka ljusstyrkan när knappen hålls inne
 
 ######## FUNKTIONER ########
 
 ### LED-FUNKTIONER ###
-def SetColor(fStrip, fColor):
+def SetColor(fStrip: PixelStrip, fColor: LedColor):
     for i in range(fStrip.numPixels()):
         fStrip.setPixelColor(i, fColor)
     fStrip.show()
@@ -144,9 +159,9 @@ def ClearLeds(fStrip):
     fStrip.show()
 
 
-def UpdateTime(fStrip, fTime, fColor, fBrightness):
-    ClearLeds(fStrip)                   # Rensa LEDs innan ändring
-    fStrip.setBrightness(fBrightness)   # Ställ in önskad ljusstyrka
+def UpdateTime(fStrip: PixelStrip, fTime: datetime, fColor: LedColor, fBrightness: int) -> None:
+    ClearLeds(fStrip)  # Rensa LEDs innan ändring
+    fStrip.setBrightness(fBrightness)  # Ställ in önskad ljusstyrka
 
     # Tänd "KLOCKAN ÄR"
     for iLed in word_leds[0]:
@@ -167,45 +182,13 @@ def UpdateTime(fStrip, fTime, fColor, fBrightness):
             display_hour = 1  # Återställ till 1 efter 12
 
     # Mappa timme till index i hour_leds
-    hour_index = (display_hour - 1)  # Nollbaserat index
+    hour_index = display_hour - 1  # Nollbaserat index
 
-    # Bestäm vilka ord som ska tändas baserat på aktuell minut
-    if minute >= 0 and minute < 5:
-        # "KLOCKAN ÄR" + timme
-        words_to_light = []
-    elif minute >= 5 and minute < 10:
-        # "Fem Över" + timme
-        words_to_light = word_leds[8]
-    elif minute >= 10 and minute < 15:
-        # "Tio Över" + timme
-        words_to_light = word_leds[9]
-    elif minute >= 15 and minute < 20:
-        # "Kvart Över" + timme
-        words_to_light = word_leds[10]
-    elif minute >= 20 and minute < 25:
-        # "Tjugo Över" + timme
-        words_to_light = word_leds[11]
-    elif minute >= 25 and minute < 30:
-        # "Fem I Halv" + nästa timme
-        words_to_light = word_leds[5]
-    elif minute >= 30 and minute < 35:
-        # "Halv" + nästa timme
-        words_to_light = word_leds[6]
-    elif minute >= 35 and minute < 40:
-        # "Fem Över Halv" + nästa timme
-        words_to_light = word_leds[7]
-    elif minute >= 40 and minute < 45:
-        # "Tjugo I" + nästa timme
-        words_to_light = word_leds[4]
-    elif minute >= 45 and minute < 50:
-        # "Kvart I" + nästa timme
-        words_to_light = word_leds[3]
-    elif minute >= 50 and minute < 55:
-        # "Tio I" + nästa timme
-        words_to_light = word_leds[2]
-    elif minute >= 55 and minute < 60:
-        # "Fem I" + nästa timme
-        words_to_light = word_leds[1]
+    # Iterate over the intervals and find the corresponding words to light
+    for time_range, words in time_intervals:
+        if minute in time_range:
+            words_to_light = words
+            break
     else:
         words_to_light = []
 
@@ -230,6 +213,7 @@ def UpdateTime(fStrip, fTime, fColor, fBrightness):
     # Uppdatera LEDs
     fStrip.show()
 
+
 ### KNAPPHANTERING ###
 button = Button(BUTTON_PIN, pull_up=True, hold_time=BUTTON_HOLD_TIME, bounce_time=BOUNCE_TIME)
 
@@ -252,7 +236,7 @@ def adjust_brightness():
         time.sleep(0.05)  # Justera för mjuk övergång
 
     # När justeringen är klar, uppdatera klockan med aktuell ljusstyrka
-    currentTime = datetime.datetime.now()
+    currentTime = datetime.now()
     UpdateTime(strip, currentTime, currentColor, currentBrightness)
 
 def on_button_pressed():
@@ -270,7 +254,7 @@ def on_button_released():
         # currentColorIndex = (currentColorIndex + 1) % len(color_options)
         currentColor = next(color_cycle)
         # Uppdatera displayen med den nya färgen
-        currentTime = datetime.datetime.now()
+        currentTime = datetime.now()
         UpdateTime(strip, currentTime, currentColor, currentBrightness)
         print("Färg ändrad till alternativ {}".format(currentColor.name))
     else:
@@ -290,6 +274,10 @@ button.when_held = on_button_held
 
 ######## HUVUDLOOP ########
 while True:  # Yttre loop för att hantera omstarter och fel
+
+    # Make sure this is initialized here for now
+    old_minute = datetime.now().minute
+
     try:
         ######## KLOCKSTART ########
         if not clockStarted:  # Starta klockan
@@ -297,7 +285,7 @@ while True:  # Yttre loop för att hantera omstarter och fel
             ClearLeds(strip)
 
             ######## KLOCKA UPPDATERA TID FÖRSTA START ########
-            currentTime = datetime.datetime.now()
+            currentTime = datetime.now()
             UpdateTime(strip, currentTime, currentColor, currentBrightness)
             old_minute = currentTime.minute
 
@@ -306,7 +294,7 @@ while True:  # Yttre loop för att hantera omstarter och fel
 
         while clockStarted:  # Klockans loop
             # Hämta aktuell tid
-            currentTime = datetime.datetime.now()
+            currentTime = datetime.now()
 
             # Om en ny minut har passerat, uppdatera klockan
             if currentTime.minute != old_minute:
