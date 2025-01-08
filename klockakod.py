@@ -18,7 +18,6 @@ from rpi_ws281x import Color, PixelStrip, ws
 import time
 from datetime import datetime
 import threading
-import sys
 import traceback
 from enum import Enum
 import itertools
@@ -251,7 +250,6 @@ def on_button_released():
     print("Knapp släppt vid {:.2f}, hålltid: {:.2f} sekunder".format(release_time, hold_duration))
     if hold_duration < BUTTON_HOLD_TIME:
         # Knappen klickades, ändra färg
-        # currentColorIndex = (currentColorIndex + 1) % len(color_options)
         currentColor = next(color_cycle)
         # Uppdatera displayen med den nya färgen
         currentTime = datetime.now()
